@@ -95,4 +95,4 @@ MIT — do whatever you like with it.
 
 ---
 
-*Made with ☕ and too many open Discord tabs.*
+*Made with ☕ and too many hours in Discord.*
