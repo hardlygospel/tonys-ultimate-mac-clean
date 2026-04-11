@@ -189,14 +189,23 @@ def is_protected(f: Path) -> bool:
     return False
 
 def move_dated(f: Path, dest_root: Path) -> bool:
-    """Move f into dest_root/YYYY/MM/. Returns True on success."""
+    """Move f into dest_root/YYYY/MM/.
+    Uses os.rename (instant on same volume); falls back to copy+delete
+    only when crossing filesystem boundaries (e.g. iCloud Drive)."""
     if is_protected(f):
         return False
     year, month = file_date(f)
     dest_dir = dest_root / year / month
     dest_dir.mkdir(parents=True, exist_ok=True)
+    dest = unique_dest(dest_dir, f.name)
     try:
-        shutil.move(str(f), str(unique_dest(dest_dir, f.name)))
+        os.rename(f, dest)        # instant — same volume
+        return True
+    except OSError:
+        pass
+    try:
+        shutil.copy2(str(f), str(dest))
+        f.unlink()
         return True
     except Exception:
         return False
@@ -229,7 +238,9 @@ print("  ╚══════════════════════�
 print(NC)
 
 # Common shallow-sweep roots (top-level only — never recurse into these directly)
-SHALLOW_ROOTS = [DESKTOP, DOWNLOADS, DOCUMENTS, PICTURES, HOME]
+# PICTURES is excluded — we recurse into specific subdirs only (Screenshots, etc.)
+# HOME is excluded — too broad; only explicit named roots are swept
+SHALLOW_ROOTS = [DESKTOP, DOWNLOADS, DOCUMENTS]
 
 
 # ══════════════════════════════════════════════════════════════
@@ -244,21 +255,41 @@ def is_screenshot(name: str) -> bool:
             or name.startswith("Screenshot_"))
 
 SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
-OLD_SS_DIRS = [DESKTOP / "Screenshots", HOME / "Screenshots"]
+
+# Explicit dirs to recurse into for screenshot consolidation.
+# SCREENSHOTS_DIR itself is included so any flat dumps get sorted into YYYY/MM.
+OLD_SS_DIRS = [
+    DESKTOP / "Screenshots",
+    HOME    / "Screenshots",
+    SCREENSHOTS_DIR,          # normalise existing target if already partially populated
+]
+
+# Shallow scan of common drop zones (top-level files only)
+SS_SCAN_ROOTS = [DESKTOP, DOWNLOADS, DOCUMENTS, HOME]
 
 sp = Spinner("Scanning for screenshots")
 
 candidates = []
-for root in SHALLOW_ROOTS:
+for root in SS_SCAN_ROOTS:
     if root.exists():
         for f in root.iterdir():
             if f.is_file() and is_screenshot(f.name):
                 candidates.append(f)
+# Recurse into known screenshot folders only
 for old_dir in OLD_SS_DIRS:
     if old_dir.exists():
         for f in old_dir.rglob("*"):
             if f.is_file() and is_screenshot(f.name):
                 candidates.append(f)
+# Deduplicate by resolved path
+seen = set()
+deduped = []
+for f in candidates:
+    key = f.resolve()
+    if key not in seen:
+        seen.add(key)
+        deduped.append(f)
+candidates = deduped
 
 ss_moved = ss_skip = 0
 for i, f in enumerate(candidates):
@@ -294,7 +325,7 @@ PDFS_DIR.mkdir(parents=True, exist_ok=True)
 sp = Spinner("Scanning for PDFs")
 
 pdf_cands = []
-for root in SHALLOW_ROOTS:
+for root in [DESKTOP, DOWNLOADS, DOCUMENTS, HOME]:
     if root.exists():
         for f in root.iterdir():
             if f.is_file() and f.suffix.lower() == ".pdf":
@@ -324,7 +355,7 @@ DOCS_DIR.mkdir(parents=True, exist_ok=True)
 sp = Spinner("Scanning for documents")
 
 doc_cands = []
-for root in SHALLOW_ROOTS:
+for root in [DESKTOP, DOWNLOADS, DOCUMENTS, HOME]:
     if root.exists():
         for f in root.iterdir():
             if f.is_file() and f.suffix.lower() in DOC_EXTENSIONS:
