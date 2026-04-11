@@ -28,10 +28,14 @@ PICTURES  = HOME / "Pictures"
 DOCUMENTS = HOME / "Documents"
 
 # Organised destination roots
-SCREENSHOTS_DIR = PICTURES  / "Screenshots"   # ~/Pictures/Screenshots/YYYY/MM
-PDFS_DIR        = DOCUMENTS / "PDFs"          # ~/Documents/PDFs/YYYY/MM
-DOCS_DIR        = DOCUMENTS / "Documents"     # ~/Documents/Documents/YYYY/MM
-INSTALLERS_DIR  = DOWNLOADS / "Installers"    # ~/Downloads/Installers  (kept, not deleted)
+# All destinations live under ~/Downloads/Organised to avoid iCloud cross-volume copies.
+# iCloud syncs ~/Desktop, ~/Documents, ~/Pictures — moves into those folders are slow
+# byte-for-byte copies. ~/Downloads is local by default on macOS.
+ORGANISED       = DOWNLOADS / "Organised"
+SCREENSHOTS_DIR = ORGANISED / "Screenshots"
+PDFS_DIR        = ORGANISED / "PDFs"
+DOCS_DIR        = ORGANISED / "Documents"
+INSTALLERS_DIR  = ORGANISED / "Installers"
 
 MISC    = DESKTOP   / "Misc"
 ARCHIVE = DOWNLOADS / "Archive"
@@ -47,8 +51,12 @@ DOC_EXTENSIONS       = {".docx", ".doc", ".odt", ".rtf", ".pages"}
 # Folders we never reorganise — files already in these are left alone
 PROTECTED_DIRS = {
     SCREENSHOTS_DIR, PDFS_DIR, DOCS_DIR, INSTALLERS_DIR,
+    ORGANISED,
     MISC, ARCHIVE,
-    DESKTOP / "Screenshots",   # old location — drained separately
+    DESKTOP   / "Screenshots",
+    PICTURES  / "Screenshots",   # old iCloud location from previous runs
+    DOCUMENTS / "PDFs",
+    DOCUMENTS / "Documents",
 }
 
 
@@ -257,11 +265,12 @@ def is_screenshot(name: str) -> bool:
 SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Explicit dirs to recurse into for screenshot consolidation.
-# SCREENSHOTS_DIR itself is included so any flat dumps get sorted into YYYY/MM.
+# Includes old iCloud locations so we drain them into the local destination.
 OLD_SS_DIRS = [
-    DESKTOP / "Screenshots",
-    HOME    / "Screenshots",
-    SCREENSHOTS_DIR,          # normalise existing target if already partially populated
+    DESKTOP   / "Screenshots",
+    HOME      / "Screenshots",
+    PICTURES  / "Screenshots",   # old iCloud destination from previous runs
+    SCREENSHOTS_DIR,             # normalise existing target structure
 ]
 
 # Shallow scan of common drop zones (top-level files only)
@@ -878,11 +887,11 @@ print(f"  ║   ⏱   Finished in {elapsed}s{' ' * (29 - len(str(elapsed)))}║"
 print("  ║   📊  Report opened on Desktop               ║")
 print("  ╚════════════════════════════════════════════════╝")
 print(NC)
-print(f"  {D}Files are organised here:{NC}")
-print(f"  {D}  📸 Screenshots  →  ~/Pictures/Screenshots/YYYY/MM{NC}")
-print(f"  {D}  📄 PDFs         →  ~/Documents/PDFs/YYYY/MM{NC}")
-print(f"  {D}  📝 Documents    →  ~/Documents/Documents/YYYY/MM{NC}")
-print(f"  {D}  💿 Installers   →  ~/Downloads/Installers{NC}")
+print(f"  {D}Files are organised here (local, not iCloud):{NC}")
+print(f"  {D}  📸 Screenshots  →  ~/Downloads/Organised/Screenshots/YYYY/MM{NC}")
+print(f"  {D}  📄 PDFs         →  ~/Downloads/Organised/PDFs/YYYY/MM{NC}")
+print(f"  {D}  📝 Documents    →  ~/Downloads/Organised/Documents/YYYY/MM{NC}")
+print(f"  {D}  💿 Installers   →  ~/Downloads/Organised/Installers{NC}")
 print(f"  {D}  🗂  Desktop misc →  ~/Desktop/Misc{NC}")
 print(f"  {D}  📥 Old downloads →  ~/Downloads/Archive{NC}\n")
 print(f"  {D}Tip: run with --full to also clean Xcode & Docker{NC}\n")
