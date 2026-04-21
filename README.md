@@ -95,6 +95,6 @@ Tested on macOS Ventura and Sonoma. Works from any shell including fish.
 
 This project is licensed under the **GNU General Public License v3.0**.
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](https://github.com/hardlygospel/jellyfin-mediastack/blob/main/LICENSE)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](https://github.com/hardlygospel/tonys-ultimate-mac-clean/blob/main/LICENSE)
 
-You are free to use, modify, and distribute this software under the terms of the GPL-3.0. See the [full licence](https://github.com/hardlygospel/jellyfin-mediastack/blob/main/LICENSE) for details.
+You are free to use, modify, and distribute this software under the terms of the GPL-3.0. See the [full licence](https://github.com/hardlygospel/tonys-ultimate-mac-clean/blob/main/LICENSE) for details.
