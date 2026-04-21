@@ -1,4 +1,6 @@
 # 🍎⚡ Tony's Ultimate Mac Clean
+
+[![Stars](https://img.shields.io/github/stars/hardlygospel/tonys-ultimate-mac-clean?style=for-the-badge&color=yellow)](https://github.com/hardlygospel/tonys-ultimate-mac-clean/stargazers) [![Forks](https://img.shields.io/github/forks/hardlygospel/tonys-ultimate-mac-clean?style=for-the-badge&color=blue)](https://github.com/hardlygospel/tonys-ultimate-mac-clean/network/members) [![Last Commit](https://img.shields.io/github/last-commit/hardlygospel/tonys-ultimate-mac-clean?style=for-the-badge&color=green)](https://github.com/hardlygospel/tonys-ultimate-mac-clean/commits) [![License](https://img.shields.io/github/license/hardlygospel/tonys-ultimate-mac-clean?style=for-the-badge)](https://github.com/hardlygospel/tonys-ultimate-mac-clean/blob/main/LICENSE)
 ### *For Discord Users & Gamers*
 
 > One command. No intervention. Walk away with a faster, cleaner Mac.
